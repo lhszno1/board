@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ﻿Mybatis mapper를 작성하기 위한 문서타입(DTD)설정 -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- mapper : interface에 정의한 SQL 실행 메소드와 mybatis의 태그요소를 연결. -->
+<mapper namespace="com.solo.board.dao.MemberDao">
+	<!-- 회원가입(id 중복처리) -->
+	<select id="idCheck" parameterType="String" resultType="Integer">
+	 	SELECT COUNT(*) FROM m WHERE m_id = #{id}
+	</select>
+	<!-- 회원가입처리 -->
+	<insert id="memberInsert" parameterType="com.solo.board.dto.MemberDto">
+	 	INSERT INTO m VALUES (#{m_id}, #{m_pwd}, #{m_name}, #{m_birth}, #{m_addr}, #{m_phone},DEFAULT)
+	</insert>
+	<!-- 로그인(비밀번호 구하기) -->
+	<select id="pwdSelect" parameterType="String" resultType="String">
+	 	SELECT m_pwd FROM m WHERE m_id = #{id}
+	</select>
+	<!-- 회원정보 구하기 -->
+	<select id="memberSelect" parameterType="String" resultType="com.solo.board.dto.MemberDto">
+	 	SELECT * FROM minfo WHERE m_id = #{id}
+	</select>
+	<!-- 회원 포인트 수정 -->
+	<update id="mPointUpdate" parameterType="String">
+		UPDATE m SET m_point = m_point + 5 WHERE m_id = #{id}
+	</update>
+</mapper>

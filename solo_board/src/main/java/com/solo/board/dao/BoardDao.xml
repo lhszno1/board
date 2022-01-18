@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ﻿Mybatis mapper를 작성하기 위한 문서타입(DTD)설정 -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- mapper : interface에 정의한 SQL 실행 메소드와 mybatis의 태그요소를 연결. -->
+<mapper namespace="com.solo.board.dao.BoardDao">
+	<!--1 게시글 목록 가져오기 -->
+	<select id="getList" parameterType="HashMap" resultType="com.solo.board.dto.BoardDto">
+	 	<!-- xml의 수식부터 처리방식 <>들어갔을 경우 혼란 방지 -->
+	 	<![CDATA[
+	 		SELECT * FROM BLIST_1
+	 		WHERE RONUM >= (#{num} * #{lcnt}) - (#{lcnt} - 1)
+	 		AND RONUM <= #{num} * #{lcnt}
+	 	]]>	 	
+	</select>
+	<!--2 페이징 처리 -->
+	<select id="getboardCnt" resultType="Integer">
+		SELECT COUNT(*) FROM blist_1
+	</select>
+	<!--3 게시글 처리 -->
+	<insert id="boardInsert" parameterType="com.solo.board.dto.BoardDto" useGeneratedKeys="true" keyProperty="bnum">
+		<selectKey keyProperty="bnum" resultType="Integer" order="BEFORE">
+			SELECT BOARD_SEQ.NEXTVAL FROM DUAL
+		</selectKey>
+		INSERT INTO B VALUES (${bnum},#{btitle},#{bcontents},#{bid},DEFAULT,DEFAULT)
+	</insert>
+	<!--4 파일처리 -->
+	<insert id="fileInsert" parameterType="HashMap">
+		INSERT INTO BF VALUES (BF_SEQ.NEXTVAL,#{bnum},#{oriName},#{sysName})
+	</insert>
+	<!--5 글내용 가져오기 -->
+	<select id="getContents" parameterType="Integer" resultType="com.solo.board.dto.BoardDto">
+		SELECT * FROM blist_1 WHERE bnum = #{bnum}
+	</select>
+	<!--6 파일목록 가져오기 -->
+	<select id="getBfList" parameterType="Integer" resultType="com.solo.board.dto.BfileDto">
+		SELECT * FROM bf WHERE bf_bnum = #{bnum}
+	</select>
+	<!--7 댓글목록 가져오기 -->
+	<select id="getReList" parameterType="Integer" resultType="com.solo.board.dto.ReplyDto">
+		SELECT * FROM rlist WHERE r_bnum = #{bnum}
+	</select>
+	<!--8 댓글 저장 -->
+	<insert id="replyInsert" parameterType="com.solo.board.dto.ReplyDto">
+		INSERT INTO r VALUES (REPLY_SEQ.NEXTVAL,#{r_bnum},#{r_contents},#{r_id},DEFAULT)
+	</insert>
+	<!--9 조회수 증가 -->
+	<update id="viewUpdate" parameterType="Integer">
+		UPDATE b SET b_views=b_views + 1 WHERE b_num = #{bnum}
+	</update>
+	<!--10 게시물 업데이트 -->
+	<update id="boardUpdate" parameterType="com.solo.board.dto.BoardDto">
+		UPDATE b SET b_title = #{btitle}, b_contents = #{bcontents} WHERE b_num = #{bnum}
+	</update>
+	<!--11 개별 파일 삭제(게시물 수정시) -->
+	<delete id="fileDelete" parameterType="String">
+		DELETE FROM bf WHERE bf_sysname = #{sysName}
+	</delete>
+	<!--12 게시글 댓글삭제 -->
+	<delete id="replyDelete" parameterType="Integer">
+		DELETE FROM r WHERE r_bnum = #{bnum}
+	</delete>
+	<!--13 게시글의 파일 삭제(같은 게시물의 모든 파일 삭제) -->
+	<delete id="filesListDelete" parameterType="Integer">
+		DELETE FROM bf WHERE bf_bnum = #{bnum}
+	</delete>
+	<!--14 게시글 삭제 -->
+	<delete id="boardDelete" parameterType="Integer">
+		DELETE FROM b WHERE b_num = #{bnum}
+	</delete>
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
